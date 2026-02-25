@@ -3,7 +3,7 @@ import { CasServer } from "/services/CasServer";
 import { LatexMathCommand } from "./LatexMathCommand";
 import { EquationExtractor } from "/utils/EquationExtractor";
 import { LmatEnvironment } from "/models/cas/LmatEnvironment";
-import { formatLatex } from "/utils/LatexFormatter";
+import { formatTypst } from "/utils/TypstFormatter";
 import { EvaluateArgsPayload, EvaluateMessage, EvaluateMode, EvaluateResponse } from "/models/cas/messages/EvaluateMessage";
 
 export type Expression = { from: number, to: number, contents: string, is_multiline: boolean };
@@ -55,7 +55,7 @@ export class EvaluateCommand extends LatexMathCommand {
     protected async insertResponse(response: EvaluateResponse, expression: Expression, editor: Editor): Promise<void> {
 
         const insert_pos: EditorPosition = editor.offsetToPos(expression.to);
-        let insert_content = ` ${response.metadata.separator} ` + await formatLatex(response.evaluated_expression);
+        let insert_content = ` ${response.metadata.separator} ` + await formatTypst(response.evaluated_expression);
 
         // remove any newlines from the formatted latex if the math block does not support newlines.
         if (!expression.is_multiline) {

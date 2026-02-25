@@ -14,7 +14,7 @@ from lmat_cas_client.compiling.transforming.PropositionsTransformer import (
 )
 from lmat_cas_client.compiling.transforming.SystemOfExpr import SystemOfExpr
 from lmat_cas_client.LmatEnvironment import LmatEnvironment
-from lmat_cas_client.LmatLatexPrinter import lmat_latex
+from lmat_cas_client.LmatTypstPrinter import lmat_typst
 
 from .CommandHandler import CommandHandler, CommandResult
 
@@ -43,7 +43,7 @@ class EvaluateResult(CommandResult, ABC):
             )
 
         return CommandResult.result(
-            dict(evaluated_expression=lmat_latex(self.sympy_expr), metadata=metadata)
+            dict(evaluated_expression=lmat_typst(self.sympy_expr), metadata=metadata)
         )
 
 
@@ -85,7 +85,7 @@ class EvalHandlerBase(CommandHandler, ABC):
                 sympy_expr = sympy_expr.rhs
 
         if isinstance(sympy_expr, PropositionExpr):
-            separator = r"\equiv"
+            separator = "equiv"
         else:
             separator = "="
 

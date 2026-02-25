@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { normLatexStr, response_verifier, server } from "../setup";
+import { response_verifier, server } from "../setup";
 import { LmatEnvironment } from "../../models/cas/LmatEnvironment";
 import { TruthTableArgsPayload, TruthTableFormat, TruthTableMessage, TruthTableResponse } from "../../models/cas/messages/TruthTableMessage";
 
@@ -15,14 +15,14 @@ test('Test TruthTable Message (markdown)', async () => {
     expect(md.split('\n')[0]).toContain("$q$");
 });
 
-test('Test TruthTable Message (latex array)', async () => {
+test('Test TruthTable Message (typst table)', async () => {
     const response = response_verifier.verifyResponse<TruthTableResponse>(await server.send(
-        new TruthTableMessage(new TruthTableArgsPayload("p \\vee q", new LmatEnvironment(), TruthTableFormat.LATEX_ARRAY))
+        new TruthTableMessage(new TruthTableArgsPayload("p \\vee q", new LmatEnvironment(), TruthTableFormat.TYPST_TABLE))
     ).response);
 
-    const latex = normLatexStr(response.truth_table);
-    expect(latex).toContain("\\begin");
-    expect(latex).toContain("\\end");
-    expect(latex).toContain("p");
-    expect(latex).toContain("q");
+    const typst = response.truth_table;
+    expect(typst).toContain("#table(");
+    expect(typst).toContain("columns:");
+    expect(typst).toContain("p");
+    expect(typst).toContain("q");
 });

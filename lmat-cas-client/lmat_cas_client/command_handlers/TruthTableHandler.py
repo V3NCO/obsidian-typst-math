@@ -13,7 +13,7 @@ from lmat_cas_client.compiling.transforming.PropositionsTransformer import (
     PropositionExpr,
 )
 from lmat_cas_client.LmatEnvironment import LmatEnvironment
-from lmat_cas_client.LmatLatexPrinter import lmat_latex
+from lmat_cas_client.LmatTypstPrinter import lmat_typst
 
 from .CommandHandler import *
 
@@ -21,7 +21,7 @@ from .CommandHandler import *
 # Enum of all truth table formats this handler supports.
 class TruthTableFormat(Enum):
     MARKDOWN = "md"
-    LATEX_ARRAY = "latex-array"
+    TYPST_TABLE = "typst-table"
 
 
 class TruthTableMessage(BaseModel):
@@ -56,7 +56,7 @@ class TruthTableResultMarkdown(TruthTableResult):
             markdown_table_contents.append(["T" if elem else "F" for elem in row])
             markdown_table_contents[-1][-1] = f"**{markdown_table_contents[-1][-1]}**"
 
-        headers = [*map(lmat_latex, self.columns), self.serialized_proposition]
+        headers = [*map(lmat_typst, self.columns), self.serialized_proposition]
         headers = [f"${header}$" for header in headers]
 
         return CommandResult.result({
@@ -69,22 +69,33 @@ class TruthTableResultMarkdown(TruthTableResult):
         })
 
 
-# implementation for LATEX_ARRAY
-class TruthTableResultLatex(TruthTableResult):
+# implementation for TYPST_TABLE
+class TruthTableResultTypst(TruthTableResult):
     def getResponsePayload(self) -> dict:
-        array_contents = []
+        col_count = len(self.columns) + 1
 
+        # Build header cells.
+        header_cells = [f"[*${lmat_typst(col)}$*]" for col in self.columns]
+        header_cells.append(f"[*${self.serialized_proposition}$*]")
+
+        # Build data cells — each boolean value is an individual table cell.
+        data_cells = []
         for row in self.truth_table:
-            array_contents.append("&".join(map(lmat_latex, row)))
+            for i, elem in enumerate(row):
+                val = "T" if elem else "F"
+                # Bold the last column (result).
+                data_cells.append(f"[*{val}*]" if i == len(row) - 1 else f"[{val}]")
 
-        array_contents = r"\\ \hline ".join(array_contents)
-
-        array_options = rf"{{{':'.join(('c' for _ in self.columns))}|c}}"
-
-        headers = rf"{'&'.join(map(lmat_latex, self.columns))} & {self.serialized_proposition}"
+        all_cells = header_cells + data_cells
+        cells_str = ",\n  ".join(all_cells)
 
         return CommandResult.result({
-            "truth_table": rf"\begin{{array}}{array_options}{headers}\\ \hline{array_contents}\end{{array}}"
+            "truth_table": (
+                f"#table(\n"
+                f"  columns: {col_count},\n"
+                f"  {cells_str}\n"
+                f")"
+            )
         })
 
 
@@ -124,8 +135,8 @@ class TruthTableHandler(CommandHandler):
         match message.truth_table_format:
             case TruthTableFormat.MARKDOWN:
                 result_cls = TruthTableResultMarkdown
-            case TruthTableFormat.LATEX_ARRAY:
-                result_cls = TruthTableResultLatex
+            case TruthTableFormat.TYPST_TABLE:
+                result_cls = TruthTableResultTypst
             case _:
                 raise HandlerError(
                     f"Unknown table format: {message.truth_table_format}"

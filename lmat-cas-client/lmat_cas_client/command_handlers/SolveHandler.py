@@ -9,7 +9,7 @@ from lmat_cas_client.compiling.Compiler import Compiler
 from lmat_cas_client.compiling.DefinitionStore import DefinitionStore
 from lmat_cas_client.compiling.transforming.SystemOfExpr import SystemOfExpr
 from lmat_cas_client.LmatEnvironment import LmatEnvironment
-from lmat_cas_client.LmatLatexPrinter import lmat_latex
+from lmat_cas_client.LmatTypstPrinter import lmat_typst
 from lmat_cas_client.math_lib.SymbolUtils import symbols_variable_order
 from lmat_cas_client.math_lib.units import UnitUtils
 
@@ -46,12 +46,12 @@ class SolveResult(CommandResult):
             and len(solutions_set) <= SolveResult.MAX_RELATIONAL_FINITE_SOLUTIONS
         ):
             return CommandResult.result(
-                dict(solution_set=lmat_latex(solutions_set.as_relational(symbols)))
+                dict(solution_set=lmat_typst(solutions_set.as_relational(symbols)))
             )
         else:
             return CommandResult.result(
                 dict(
-                    solution_set=f"{lmat_latex(symbols)} \\in {lmat_latex(solutions_set)}"
+                    solution_set=f"{lmat_typst(symbols)} in {lmat_typst(solutions_set)}"
                 )
             )
 
@@ -159,7 +159,7 @@ class SolveInfoResult(CommandResult):
             dict(
                 required_symbols=self.equation_count,
                 available_symbols=[
-                    dict(sympy_symbol=str(s), latex_symbol=lmat_latex(s))
+                    dict(sympy_symbol=str(s), latex_symbol=lmat_typst(s))
                     for s in self.symbols
                 ],
             )

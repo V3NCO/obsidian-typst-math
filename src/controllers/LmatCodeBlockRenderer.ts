@@ -19,12 +19,12 @@ export class LmatCodeBlockRenderer {
         const div = el.createDiv("HyperMD-codeblock HyperMD-codeblock-bg lmat-block-container-flair");
         // same goes with the code block flair
         const flair = div.createSpan("code-block-flair lmat-block-flair");
-        flair.innerText = "Latex Math";
+        flair.innerText = "Typst Math";
         div.appendChild(flair);
 
         el.appendChild(div);
 
-        // retreive to be rendered latex from python.
+        // retreive to be rendered typst math from python.
         const result = await this.symbol_set_requester.sendRequest(
             new SymbolSetArgsPayload(LmatEnvironment.fromCodeBlock(source, []))
         );

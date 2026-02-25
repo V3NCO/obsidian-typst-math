@@ -19,7 +19,6 @@ import { EvaluateMode } from '/models/cas/messages/EvaluateMessage';
 import { TruthTableFormat } from '/models/cas/messages/TruthTableMessage';
 import { CasCommandRequester } from './services/CasCommandRequester';
 import { SymbolSetMessage } from './models/cas/messages/SymbolSetsMessage';
-import { mathjaxLoadLatexPackages } from './utils/MathJaxPackageLoader';
 
 interface LatexMathPluginSettings {
     dev_mode: boolean;
@@ -33,10 +32,10 @@ export default class LatexMathPlugin extends Plugin {
     settings: LatexMathPluginSettings;
 
     async onload() {
-        console.log(`Loading LaTeX Math (v${this.manifest.version})`);
+        console.log(`Loading Typst Math (v${this.manifest.version})`);
 
         if (!this.manifest.dir) {
-            new Notice("LaTeX Math could not determine its plugin directory, aborting load.");
+            new Notice("Typst Math could not determine its plugin directory, aborting load.");
             return;
         }
 
@@ -61,20 +60,17 @@ export default class LatexMathPlugin extends Plugin {
 
         // add commands
         this.addCommands(new Map([
-            [new EvaluateCommand(EvaluateMode.EVAL, response_verifier), 'Evaluate LaTeX expression'],
-            [new EvaluateCommand(EvaluateMode.EVALF, response_verifier), 'Evalf LaTeX expression'],
-            [new EvaluateCommand(EvaluateMode.EXPAND, response_verifier), 'Expand LaTeX expression'],
-            [new EvaluateCommand(EvaluateMode.FACTOR, response_verifier), 'Factor LaTeX expression'],
-            [new EvaluateCommand(EvaluateMode.APART, response_verifier), 'Partial fraction decompose LaTeX expression'],
-            [new SolveCommand(response_verifier), 'Solve LaTeX expression'],
-            [new ConvertSympyCommand(response_verifier), 'Convert LaTeX expression to Sympy'],
-            [new UnitConvertCommand(response_verifier), 'Convert units in LaTeX expression'],
-            [new TruthTableCommand(TruthTableFormat.MARKDOWN, response_verifier), 'Create truth table from LaTeX expression (Markdown)'],
-            [new TruthTableCommand(TruthTableFormat.LATEX_ARRAY, response_verifier), 'Create truth table from LaTeX expression (LaTeX)'],
+            [new EvaluateCommand(EvaluateMode.EVAL, response_verifier), 'Evaluate Typst expression'],
+            [new EvaluateCommand(EvaluateMode.EVALF, response_verifier), 'Evalf Typst expression'],
+            [new EvaluateCommand(EvaluateMode.EXPAND, response_verifier), 'Expand Typst expression'],
+            [new EvaluateCommand(EvaluateMode.FACTOR, response_verifier), 'Factor Typst expression'],
+            [new EvaluateCommand(EvaluateMode.APART, response_verifier), 'Partial fraction decompose Typst expression'],
+            [new SolveCommand(response_verifier), 'Solve Typst expression'],
+            [new ConvertSympyCommand(response_verifier), 'Convert Typst expression to Sympy'],
+            [new UnitConvertCommand(response_verifier), 'Convert units in Typst expression'],
+            [new TruthTableCommand(TruthTableFormat.MARKDOWN, response_verifier), 'Create truth table from Typst expression (Markdown)'],
+            [new TruthTableCommand(TruthTableFormat.TYPST_TABLE, response_verifier), 'Create truth table from Typst expression (Typst)'],
         ]));
-
-        // import latex packages
-        await mathjaxLoadLatexPackages(["physics"]);
     }
 
     // sets up the given map of commands as obsidian commands.
@@ -121,7 +117,7 @@ export default class LatexMathPlugin extends Plugin {
 
         this.spawn_cas_client_promise = this.spawnCasClient(this.manifest.dir as string);
         this.spawn_cas_client_promise.catch((err) => {
-            new Notice(`Latex Math could not start the cas client, aborting load.\n${err.message}`);
+            new Notice(`Typst Math could not start the cas client, aborting load.\n${err.message}`);
             throw err;
         });
 
@@ -198,7 +194,7 @@ export default class LatexMathPlugin extends Plugin {
             (errorLines.length > LatexMathPlugin.ERR_NOTICE_LINE_COUNT ? '\n...' : '') +
             "\n\nOpen the dev console for more info (ctrl + shift + i).";
 
-        const err_notice = new Notice("Latex Math Error\n", LatexMathPlugin.ERR_NOTICE_TIMEOUT);
+        const err_notice = new Notice("Typst Math Error\n", LatexMathPlugin.ERR_NOTICE_TIMEOUT);
 
         const err_elem = err_notice.messageEl.createEl('code');
         err_elem.innerText = truncatedError;

@@ -15,6 +15,10 @@ export function normLatexStr(latex_str: string): string {
     return latex_str.replace(/(\\,|\s)+/g, ' ').replace(/(\\left|\\right)/g, '');
 }
 
+export function normTypstStr(typst_str: string): string {
+    return typst_str.replace(/\s+/g, ' ').trim();
+}
+
 beforeEach(async () => {
     server = new CasServer();
     server_err = undefined;

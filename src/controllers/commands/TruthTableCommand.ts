@@ -3,7 +3,7 @@ import { CasServer } from "/services/CasServer";
 import { LatexMathCommand } from "./LatexMathCommand";
 import { EquationExtractor } from "/utils/EquationExtractor";
 import { LmatEnvironment } from "/models/cas/LmatEnvironment";
-import { formatLatex } from "/utils/LatexFormatter";
+import { formatTypst } from "/utils/TypstFormatter";
 import { TruthTableArgsPayload, TruthTableFormat, TruthTableMessage, TruthTableResponse } from "/models/cas/messages/TruthTableMessage";
 
 export class TruthTableCommand extends LatexMathCommand {
@@ -36,8 +36,8 @@ export class TruthTableCommand extends LatexMathCommand {
         // Insert truth table right after the current math block.
         let insert_content: string = "\n\n" + result.truth_table;
 
-        if (this.format == TruthTableFormat.LATEX_ARRAY) {
-            insert_content = "\n$$\n" + await formatLatex(insert_content) + "\n$$";
+        if (this.format == TruthTableFormat.TYPST_TABLE) {
+            insert_content = "\n\n```typst\n" + await formatTypst(result.truth_table) + "\n```";
         }
 
         editor.replaceRange(insert_content, editor.offsetToPos(equation.block_to));
