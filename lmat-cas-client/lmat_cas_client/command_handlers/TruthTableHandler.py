@@ -59,14 +59,16 @@ class TruthTableResultMarkdown(TruthTableResult):
         headers = [*map(lmat_typst, self.columns), self.serialized_proposition]
         headers = [f"${header}$" for header in headers]
 
-        return CommandResult.result({
-            "truth_table": tabulate(
-                markdown_table_contents,
-                headers=headers,
-                tablefmt="pipe",
-                colalign=("center" for _ in range(len(self.columns) + 1)),
-            )
-        })
+        return CommandResult.result(
+            {
+                "truth_table": tabulate(
+                    markdown_table_contents,
+                    headers=headers,
+                    tablefmt="pipe",
+                    colalign=("center" for _ in range(len(self.columns) + 1)),
+                )
+            }
+        )
 
 
 # implementation for TYPST_TABLE
@@ -89,14 +91,9 @@ class TruthTableResultTypst(TruthTableResult):
         all_cells = header_cells + data_cells
         cells_str = ",\n  ".join(all_cells)
 
-        return CommandResult.result({
-            "truth_table": (
-                f"#table(\n"
-                f"  columns: {col_count},\n"
-                f"  {cells_str}\n"
-                f")"
-            )
-        })
+        return CommandResult.result(
+            {"truth_table": (f"#table(\n  columns: {col_count},\n  {cells_str}\n)")}
+        )
 
 
 # TruthTableHandler attempts to generate a truth table from the given expression.

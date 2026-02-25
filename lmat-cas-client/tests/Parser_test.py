@@ -72,13 +72,15 @@ class TestParse:
         assert result.get_all_expr() == (Eq(x, y), Lt(y, z))
 
     def test_matrix(self):
-        assert self._parse_expr(r"\begin{bmatrix} 1 \\ 2 \end{bmatrix}") == Matrix([
-            [1],
-            [2],
-        ])
-        assert self._parse_expr(r"\begin{bmatrix} 1 & 2 \end{bmatrix}") == Matrix([
-            [1, 2]
-        ])
+        assert self._parse_expr(r"\begin{bmatrix} 1 \\ 2 \end{bmatrix}") == Matrix(
+            [
+                [1],
+                [2],
+            ]
+        )
+        assert self._parse_expr(r"\begin{bmatrix} 1 & 2 \end{bmatrix}") == Matrix(
+            [[1, 2]]
+        )
         assert self._parse_expr(
             r"\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}"
         ) == Matrix([[1, 2], [3, 4]])
