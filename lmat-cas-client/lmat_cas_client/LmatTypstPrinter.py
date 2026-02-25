@@ -1,6 +1,3 @@
-import re as regex
-from functools import reduce
-
 from sympy import *
 from sympy.logic.boolalg import BooleanFalse, BooleanTrue
 from sympy.physics.units import Quantity
