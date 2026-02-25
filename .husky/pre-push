@@ -8,7 +8,7 @@ else
     BIN_DIR="bin"
 fi
 
-source .venv/${BIN_DIR}/activate
+. .venv/${BIN_DIR}/activate
 
 echo Running Tests
 
