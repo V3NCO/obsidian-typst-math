@@ -24,7 +24,7 @@ export class LmatCodeBlockRenderer {
 
         el.appendChild(div);
 
-        // retreive to be rendered typst math from python.
+        // retrieve to be rendered typst math from python.
         const result = await this.symbol_set_requester.sendRequest(
             new SymbolSetArgsPayload(LmatEnvironment.fromCodeBlock(source, []))
         );

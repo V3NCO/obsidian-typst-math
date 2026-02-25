@@ -57,7 +57,7 @@ export class EvaluateCommand extends LatexMathCommand {
         const insert_pos: EditorPosition = editor.offsetToPos(expression.to);
         let insert_content = ` ${response.metadata.separator} ` + await formatTypst(response.evaluated_expression);
 
-        // remove any newlines from the formatted latex if the math block does not support newlines.
+        // remove any newlines from the formatted typst if the math block does not support newlines.
         if (!expression.is_multiline) {
             insert_content = insert_content.replaceAll('\n', ' ');
         }

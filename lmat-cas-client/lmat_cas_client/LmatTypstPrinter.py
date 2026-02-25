@@ -88,6 +88,12 @@ def _convert_symbol_name(name: str) -> str:
 class LmatTypstPrinter(StrPrinter):
     """Converts Sympy expressions to Typst math notation."""
 
+    def _print_Mul(self, expr: Mul) -> str:
+        # Use StrPrinter output (which uses '*' between factors), then convert to
+        # Typst's implicit multiplication notation (juxtaposition / space-separated).
+        result = super()._print_Mul(expr)
+        return result.replace("*", " ")
+
     def _print_Relational(self, expr) -> str:
         _REL_MAP = {
             "Equality": "=",
@@ -165,9 +171,16 @@ class LmatTypstPrinter(StrPrinter):
         return "F"
 
     def _print_Quantity(self, expr: Quantity) -> str:
-        if expr._latex_repr:
-            return expr._latex_repr
-        return str(expr.args[1] if len(expr.args) >= 2 else expr.args[0])
+        # Prefer the unit's abbreviation (e.g. 'km', 'm', 'kg') for display.
+        abbrev = getattr(expr, "abbrev", None)
+        if abbrev is not None:
+            return str(abbrev)
+        # Fall back to the full name string.
+        name = getattr(expr, "name", None)
+        if isinstance(name, str) and name:
+            return name
+        # Final fallback: generic string printer (non-LaTeX).
+        return StrPrinter().doprint(expr)
 
     def _print_matrix_contents(self, expr) -> str:
         """Print matrix contents using Typst mat() notation."""

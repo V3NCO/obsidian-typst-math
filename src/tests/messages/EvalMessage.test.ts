@@ -24,7 +24,7 @@ test('Test Expand Message', async () => {
         new EvaluateMessage(EvaluateMode.EXPAND, new EvaluateArgsPayload("(a + b) \\cdot 2", new LmatEnvironment()))
     ).response);
 
-    expect(normTypstStr(response.evaluated_expression)).toBe(normTypstStr("2*a + 2*b"));
+    expect(normTypstStr(response.evaluated_expression)).toBe(normTypstStr("2 a + 2 b"));
 });
 
 
@@ -33,7 +33,7 @@ test('Test Factor Message', async () => {
         new EvaluateMessage(EvaluateMode.FACTOR, new EvaluateArgsPayload("x^2 - 1", new LmatEnvironment()))
     ).response);
 
-    expect(normTypstStr(response.evaluated_expression)).toBe(normTypstStr("(x - 1)*(x + 1)"));
+    expect(normTypstStr(response.evaluated_expression)).toBe(normTypstStr("(x - 1) (x + 1)"));
 });
 
 
@@ -50,5 +50,5 @@ test('Test Unit Convert Message', async () => {
         new EvaluateMessage(EvaluateMode.CONVERT_UNITS, new UnitConvertArgsPayload("120 {s}", new LmatEnvironment(), ["min"]))
     ).response);
 
-    expect(normTypstStr(response.evaluated_expression)).toBe(normTypstStr("2*min"));
+    expect(normTypstStr(response.evaluated_expression)).toBe(normTypstStr("2 minute"));
 });

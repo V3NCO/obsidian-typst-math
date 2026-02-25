@@ -77,6 +77,15 @@ class TestLmatTypstPrinter:
         )
         assert lmat_typst(latex_matrix) == "mat(1, 2; 3, 4)"
 
+    def test_mul(self):
+        a, b, x = symbols("a b x")
+        # Typst uses juxtaposition (space) for multiplication, not '*'.
+        assert lmat_typst(2 * a) == "2 a"
+        assert lmat_typst(2 * a + 2 * b) == "2 a + 2 b"
+        assert lmat_typst(a * b) == "a b"
+        assert lmat_typst(-2 * a) == "-2 a"
+        assert lmat_typst(expand((a + b) * 2)) == "2 a + 2 b"
+
     def test_fraction_with_symbols(self):
         a, b = symbols("a b")
         result = lmat_typst((a + b) / (a - b))
@@ -88,8 +97,11 @@ class TestLmatTypstPrinter:
         self._assert_str_equal("1/(x - 1) - 1/x", result)
 
     def test_units(self):
-        result = lmat_typst(u.km)
-        assert "km" in result
+        # Uses the unit's abbreviation for display.
+        assert lmat_typst(u.km) == "km"
+        assert lmat_typst(u.meter) == "m"
+        assert lmat_typst(u.kilogram) == "kg"
+        assert lmat_typst(5 * u.km / u.hour) == "5 km/hour"
 
     def _assert_str_equal(self, expected, actual):
         assert "".join(expected.split()) == "".join(actual.split())
