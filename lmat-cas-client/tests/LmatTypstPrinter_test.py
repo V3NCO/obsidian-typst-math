@@ -50,7 +50,7 @@ class TestLmatTypstPrinter:
         assert lmat_typst(-oo) == "-oo"
 
     def test_boolean(self):
-        from sympy.logic.boolalg import BooleanTrue, BooleanFalse
+        from sympy.logic.boolalg import BooleanFalse, BooleanTrue
         assert lmat_typst(BooleanTrue()) == "T"
         assert lmat_typst(BooleanFalse()) == "F"
 
