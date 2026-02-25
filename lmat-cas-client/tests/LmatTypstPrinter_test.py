@@ -12,6 +12,14 @@ class TestLmatTypstPrinter:
 
     def test_float(self):
         assert lmat_typst(Float("0.5")) == "0.5"
+        assert lmat_typst(Float("9.0")) == "9.0"
+
+    def test_float_scientific(self):
+        # Scientific notation must use Typst 'times 10^(exp)' syntax, not LaTeX '\cdot 10^{exp}'.
+        result = lmat_typst(Float(1e-10))
+        assert "times" in result
+        assert "10^" in result
+        assert "\\" not in result  # No backslash/LaTeX commands
 
     def test_numeric_fraction(self):
         assert lmat_typst(Rational(1, 2)) == "1/2"

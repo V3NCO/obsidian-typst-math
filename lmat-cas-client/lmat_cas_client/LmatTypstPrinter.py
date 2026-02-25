@@ -1,7 +1,6 @@
 from sympy import *
 from sympy.logic.boolalg import BooleanFalse, BooleanTrue
 from sympy.physics.units import Quantity
-from sympy.printing.latex import LatexPrinter
 from sympy.printing.precedence import precedence
 from sympy.printing.str import StrPrinter
 
@@ -116,8 +115,22 @@ class LmatTypstPrinter(StrPrinter):
         return f"not {self._print(expr.args[0])}"
 
     def _print_Float(self, expr: Float) -> str:
-        # Delegate to LatexPrinter for consistent float formatting (strips trailing zeros).
-        return LatexPrinter()._print_Float(expr)
+        # Re-implement without delegating to LatexPrinter, which uses LaTeX scientific
+        # notation like r'\cdot 10^{exp}'. Use Typst 'times 10^(exp)' instead.
+        from mpmath.libmp import to_str as mlib_to_str
+        from sympy.core.numbers import prec_to_dps
+
+        dps = prec_to_dps(expr._prec)
+        str_real = mlib_to_str(expr._mpf_, dps, strip_zeros=True)
+        # Ensure there is always a decimal point.
+        if "." not in str_real and "e" not in str_real.lower():
+            str_real += ".0"
+        if "e" in str_real:
+            mant, exp_str = str_real.split("e")
+            if exp_str.startswith("+"):
+                exp_str = exp_str[1:]
+            return f"{mant} times 10^({exp_str})"
+        return str_real
 
     def _print_Symbol(self, expr: Symbol) -> str:
         return _convert_symbol_name(expr.name)
