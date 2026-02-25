@@ -129,12 +129,7 @@ class LmatTypstPrinter(StrPrinter):
         if -exp is S.Half and not rational:
             return f"1/sqrt({self._print(base)})"
 
-        if (
-            isinstance(exp, Rational)
-            and exp.p == 1
-            and exp.q > 2
-            and not rational
-        ):
+        if isinstance(exp, Rational) and exp.p == 1 and exp.q > 2 and not rational:
             return f"root({exp.q}, {self._print(base)})"
 
         # Negative integer exponents: x^-n → 1/x^n (fraction notation).
@@ -149,9 +144,7 @@ class LmatTypstPrinter(StrPrinter):
         exp_str = self._print(exp)
 
         # Wrap complex exponents in parentheses.
-        if isinstance(exp, (Add, Mul)) or (
-            isinstance(exp, Rational) and exp.q != 1
-        ):
+        if isinstance(exp, (Add, Mul)) or (isinstance(exp, Rational) and exp.q != 1):
             exp_str = f"({exp_str})"
 
         return f"{base_str}^{exp_str}"
@@ -196,9 +189,7 @@ class LmatTypstPrinter(StrPrinter):
     def _print_LatexMatrix(self, expr: LatexMatrix) -> str:
         rows = []
         for row_index in range(expr.rows):
-            row = ", ".join(
-                self._print(expr[row_index, j]) for j in range(expr.cols)
-            )
+            row = ", ".join(self._print(expr[row_index, j]) for j in range(expr.cols))
             rows.append(row)
         return f"mat({'; '.join(rows)})"
 
