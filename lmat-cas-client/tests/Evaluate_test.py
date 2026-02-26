@@ -798,3 +798,39 @@ class TestEvaluate:
             }
         )
         assert result.sympy_expr == u.meter * E ** (u.meter * S("t"))
+
+
+## Tests Typst-style function syntax as input (e.g. sqrt(x), root(n, x), abs(x)).
+class TestTypstFunctionInput:
+    compiler = LatexToSympyCompiler()
+
+    def test_sqrt_evaluates(self):
+        handler = EvalHandler(self.compiler)
+        result = handler.handle({"expression": "sqrt(25)", "environment": {}})
+        assert result.sympy_expr == 5
+
+    def test_sqrt_symbolic(self):
+        handler = EvalHandler(self.compiler)
+        result = handler.handle({"expression": "sqrt(x)", "environment": {}})
+        assert result.sympy_expr == sqrt(Symbol("x"))
+
+    def test_cbrt_evaluates(self):
+        handler = EvalHandler(self.compiler)
+        result = handler.handle({"expression": "cbrt(27)", "environment": {}})
+        assert result.sympy_expr == 3
+
+    def test_root_evaluates(self):
+        # Typst syntax: root(n, expr)  — argument order reversed from SymPy root(expr, n)
+        handler = EvalHandler(self.compiler)
+        result = handler.handle({"expression": "root(3, 27)", "environment": {}})
+        assert result.sympy_expr == 3
+
+    def test_abs_evaluates(self):
+        handler = EvalHandler(self.compiler)
+        result = handler.handle({"expression": "abs(-5)", "environment": {}})
+        assert result.sympy_expr == 5
+
+    def test_ceil_evaluates(self):
+        handler = EvalHandler(self.compiler)
+        result = handler.handle({"expression": "ceil(3.2)", "environment": {}})
+        assert result.sympy_expr == 4
