@@ -1,12 +1,26 @@
 from typing import Iterator
 
 from lark import Token, Transformer, v_args
-from sympy import Expr, Function, Symbol
+from sympy import Abs, Expr, Function, Symbol, cbrt, ceiling, root, sqrt
 from sympy.physics.units import Quantity
 
 from lmat_cas_client.compiling import DefinitionStore
 from lmat_cas_client.compiling.Definitions import SympyDefinition
 from lmat_cas_client.math_lib.units import UnitUtils
+
+# Mapping from plain/Typst function names to their SymPy equivalents.
+# Functions in this map are NOT in SymPy's FunctionClass registry, so
+# Function('name')(*args) would create an unevaluated custom function instead
+# of calling the real SymPy operation.
+#
+# Note: Typst's root(n, x) has reversed argument order vs SymPy's root(x, n).
+_TYPST_TO_SYMPY_FUNCTION = {
+    "sqrt": lambda *args: sqrt(*args),
+    "cbrt": lambda *args: cbrt(*args),
+    "root": lambda *args: root(args[1], args[0]) if len(args) == 2 else root(*args),
+    "abs": lambda *args: Abs(*args),
+    "ceil": lambda *args: ceiling(*args),
+}
 
 
 @v_args(inline=True)
@@ -74,5 +88,7 @@ class UndefinedAtomsTransformer(Transformer):
             return func_definition.applied_value(
                 self.__definition_store, [SympyDefinition(arg) for arg in func_args]
             )
+        elif func_name in _TYPST_TO_SYMPY_FUNCTION:
+            return _TYPST_TO_SYMPY_FUNCTION[func_name](*func_args)
         else:
             return Function(func_name)(*func_args)

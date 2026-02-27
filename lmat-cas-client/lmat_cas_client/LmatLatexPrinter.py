@@ -79,12 +79,14 @@ class LmatLatexPrinter(LatexPrinter):
         if num_unit != 1 or den_unit != 1:
             unit_value = num_unit / den_unit
 
-        result = self._settings["mul_symbol_latex"].join([
-            super()._print_Mul(e)
-            for e in filter(
-                lambda x: x is not None, [const_value, sym_value, unit_value]
-            )
-        ])
+        result = self._settings["mul_symbol_latex"].join(
+            [
+                super()._print_Mul(e)
+                for e in filter(
+                    lambda x: x is not None, [const_value, sym_value, unit_value]
+                )
+            ]
+        )
 
         return result
 
@@ -105,9 +107,11 @@ class LmatLatexPrinter(LatexPrinter):
         constants, non_constants = sift(args, lambda a: a.is_number, binary=True)
         units, symbols = sift(
             non_constants,
-            lambda s: isinstance(s, Quantity)
-            or isinstance(s, Pow)
-            and isinstance(s.base, Quantity),
+            lambda s: (
+                isinstance(s, Quantity)
+                or isinstance(s, Pow)
+                and isinstance(s.base, Quantity)
+            ),
             binary=True,
         )
 

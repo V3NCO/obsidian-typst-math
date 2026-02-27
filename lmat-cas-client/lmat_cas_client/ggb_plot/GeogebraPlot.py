@@ -68,49 +68,57 @@ class GeogebraPlot:
 
         ElementTree.SubElement(
             self._construction, "element", type="numeric", label="C_r_a_n_g_e"
-        ).extend([
-            Element("value", val="100.0"),
-        ])
+        ).extend(
+            [
+                Element("value", val="100.0"),
+            ]
+        )
 
         ElementTree.SubElement(
             self._construction, "element", type="numeric", label="N"
-        ).extend([
-            Element("value", val="3"),
-            Element("show", object="true", label="true"),
-            Element("slider", min="0", max="25", absoluteScreenLocation="true"),
-            Element("animation", step="1"),
-            Element("labelMode", val="1"),
-        ])
+        ).extend(
+            [
+                Element("value", val="3"),
+                Element("show", object="true", label="true"),
+                Element("slider", min="0", max="25", absoluteScreenLocation="true"),
+                Element("animation", step="1"),
+                Element("labelMode", val="1"),
+            ]
+        )
 
         ElementTree.SubElement(
             self._construction, "element", type="numeric", label="C_m_i_n"
-        ).extend([
-            Element("value", val="-100.0"),
-            Element("show", object="true", label="true"),
-            Element(
-                "slider",
-                min="-C_r_a_n_g_e",
-                max="C_r_a_n_g_e",
-                absoluteScreenLocation="true",
-            ),
-            Element("animation", step="0.1"),
-            Element("labelMode", val="1"),
-        ])
+        ).extend(
+            [
+                Element("value", val="-100.0"),
+                Element("show", object="true", label="true"),
+                Element(
+                    "slider",
+                    min="-C_r_a_n_g_e",
+                    max="C_r_a_n_g_e",
+                    absoluteScreenLocation="true",
+                ),
+                Element("animation", step="0.1"),
+                Element("labelMode", val="1"),
+            ]
+        )
 
         ElementTree.SubElement(
             self._construction, "element", type="numeric", label="C_m_a_x"
-        ).extend([
-            Element("value", val="100.0"),
-            Element("show", object="true", label="true"),
-            Element(
-                "slider",
-                min="-C_r_a_n_g_e",
-                max="C_r_a_n_g_e",
-                absoluteScreenLocation="true",
-            ),
-            Element("animation", step="0.1"),
-            Element("labelMode", val="1"),
-        ])
+        ).extend(
+            [
+                Element("value", val="100.0"),
+                Element("show", object="true", label="true"),
+                Element(
+                    "slider",
+                    min="-C_r_a_n_g_e",
+                    max="C_r_a_n_g_e",
+                    absoluteScreenLocation="true",
+                ),
+                Element("animation", step="0.1"),
+                Element("labelMode", val="1"),
+            ]
+        )
 
         ElementTree.SubElement(
             self._construction,
@@ -126,41 +134,47 @@ class GeogebraPlot:
 
         # ANOTHEr sequence should be here which is the level set values, which are used in the labeling.
 
-        ElementTree.SubElement(self._construction, "command", name="Sequence").extend([
-            Element(
-                "input",
-                a0="c",
-                a1="c",
-                a2="C_m_i_n",
-                a3="C_m_a_x",
-                a4="abs(C_m_i_n - C_m_a_x) / N",
-            ),
-            Element("output", a0="LevelSets"),
-        ])
+        ElementTree.SubElement(self._construction, "command", name="Sequence").extend(
+            [
+                Element(
+                    "input",
+                    a0="c",
+                    a1="c",
+                    a2="C_m_i_n",
+                    a3="C_m_a_x",
+                    a4="abs(C_m_i_n - C_m_a_x) / N",
+                ),
+                Element("output", a0="LevelSets"),
+            ]
+        )
 
         # Create sequence for contour curves
-        ElementTree.SubElement(self._construction, "command", name="Zip").extend([
-            Element(
-                "input",
-                a0=f"c = {print_geogebra(self._try_replace_func(expr))}",
-                a1="c",
-                a2="LevelSets",
-            ),
-            Element("output", a0="ContourCurves"),
-        ])
+        ElementTree.SubElement(self._construction, "command", name="Zip").extend(
+            [
+                Element(
+                    "input",
+                    a0=f"c = {print_geogebra(self._try_replace_func(expr))}",
+                    a1="c",
+                    a2="LevelSets",
+                ),
+                Element("output", a0="ContourCurves"),
+            ]
+        )
 
         # Create sequence for contour labels
-        ElementTree.SubElement(self._construction, "command", name="Zip").extend([
-            Element(
-                "input",
-                a0="Text[c, ClosestPoint[CC, CenterPoint]]",
-                a1="CC",
-                a2="ContourCurves",
-                a3="c",
-                a4="LevelSets",
-            ),
-            Element("output", a0="ContourLabels"),
-        ])
+        ElementTree.SubElement(self._construction, "command", name="Zip").extend(
+            [
+                Element(
+                    "input",
+                    a0="Text[c, ClosestPoint[CC, CenterPoint]]",
+                    a1="CC",
+                    a2="ContourCurves",
+                    a3="c",
+                    a4="LevelSets",
+                ),
+                Element("output", a0="ContourLabels"),
+            ]
+        )
 
         pass
 

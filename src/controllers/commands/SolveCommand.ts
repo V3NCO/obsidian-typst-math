@@ -1,6 +1,6 @@
 import { App, Editor, MarkdownView, Notice } from "obsidian";
 import { EquationExtractor } from "/utils/EquationExtractor";
-import { formatLatex } from "/utils/LatexFormatter";
+import { formatTypst } from "/utils/TypstFormatter";
 import { CasServer } from "/services/CasServer";
 import { LmatEnvironment } from "/models/cas/LmatEnvironment";
 import { SolveModeModal } from "/views/modals/SolveModeModal";
@@ -61,7 +61,7 @@ export class SolveCommand extends LatexMathCommand {
         const solve_result = this.response_verifier.verifyResponse<SolveResponse>(solve_response);
 
         // insert solution as a new math block, right after the current one.
-        editor.replaceRange("\n$$" + await formatLatex(solve_result.solution_set) + "$$", editor.offsetToPos(equation.block_to));
+        editor.replaceRange("\n$$" + await formatTypst(solve_result.solution_set) + "$$", editor.offsetToPos(equation.block_to));
         editor.setCursor(editor.offsetToPos(equation.to + solve_result.solution_set.length + 3));
 
     }

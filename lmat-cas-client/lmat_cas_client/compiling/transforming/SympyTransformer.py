@@ -80,13 +80,15 @@ class SympyTransformer(
         return expr
 
     def system_of_relations(self, relations: list[Expr]) -> SystemOfExpr:
-        return SystemOfExpr([
-            next(row)  # the row iterator should only contain 1 element
-            for is_delim, row in itertools.groupby(
-                relations, lambda t: t == self.Delim.MatDelim
-            )
-            if not is_delim
-        ])
+        return SystemOfExpr(
+            [
+                next(row)  # the row iterator should only contain 1 element
+                for is_delim, row in itertools.groupby(
+                    relations, lambda t: t == self.Delim.MatDelim
+                )
+                if not is_delim
+            ]
+        )
 
     class system_of_relations_expr:
         @staticmethod

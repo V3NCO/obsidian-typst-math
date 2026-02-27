@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { normLatexStr, response_verifier, server } from "../setup";
+import { normTypstStr, response_verifier, server } from "../setup";
 import { LmatEnvironment } from "../../models/cas/LmatEnvironment";
 import { LatexMathSymbol, SolveArgsPayload, SolveInfoArgsPayload, SolveInfoMessage, SolveInfoResponse, SolveMessage, SolveResponse } from "../../models/cas/messages/SolveMessage";
 
@@ -8,8 +8,8 @@ test('Test Solve Message', async () => {
         new SolveMessage(new SolveArgsPayload("x^2 = 4", new LmatEnvironment(), ["x"]))
     ).response);
 
-    expect(normLatexStr(response.solution_set)).toMatch(/x\s*=\s*2/g);
-    expect(normLatexStr(response.solution_set)).toMatch(/x\s*=\s*-\s*2/g);
+    expect(normTypstStr(response.solution_set)).toMatch(/x\s*=\s*2/g);
+    expect(normTypstStr(response.solution_set)).toMatch(/x\s*=\s*-\s*2/g);
 });
 
 test('Test Solve Message With Assumptions', async () => {
@@ -17,8 +17,8 @@ test('Test Solve Message With Assumptions', async () => {
         new SolveMessage(new SolveArgsPayload("x^2 = 4", new LmatEnvironment(undefined, undefined, undefined, "Naturals"), ["x"]))
     ).response);
 
-    expect(normLatexStr(response.solution_set)).toMatch(/x\s*=\s*2/g);
-    expect(normLatexStr(response.solution_set)).not.toMatch(/x\s*=\s*-\s*2/g);
+    expect(normTypstStr(response.solution_set)).toMatch(/x\s*=\s*2/g);
+    expect(normTypstStr(response.solution_set)).not.toMatch(/x\s*=\s*-\s*2/g);
 });
 
 
@@ -27,13 +27,13 @@ test('Test Solve Message Multivariate', async () => {
         new SolveMessage(new SolveArgsPayload("x - y = 0", new LmatEnvironment(), ["x"]))
     ).response);
 
-    expect(normLatexStr(response.solution_set)).toMatch(/x\s*=\s*y/g);
+    expect(normTypstStr(response.solution_set)).toMatch(/x\s*=\s*y/g);
 
     response = response_verifier.verifyResponse<SolveResponse>(await server.send(
         new SolveMessage(new SolveArgsPayload("x - y = 0", new LmatEnvironment(), ["y"]))
     ).response);
 
-    expect(normLatexStr(response.solution_set)).toMatch(/y\s*=\s*x/g);
+    expect(normTypstStr(response.solution_set)).toMatch(/y\s*=\s*x/g);
 });
 
 test('Test Solve Info', async () => {
