@@ -1,3 +1,5 @@
+from typing import Any
+
 from sympy import *
 from sympy.logic.boolalg import BooleanFalse, BooleanTrue
 from sympy.physics.units import Quantity
@@ -168,6 +170,20 @@ class LmatTypstPrinter(StrPrinter):
 
         return f"{base_str}^{exp_str}"
 
+    def _print_Abs(self, expr) -> str:
+        return f"abs({self._print(expr.args[0])})"
+
+    def _print_ceiling(self, expr) -> str:
+        return f"ceil({self._print(expr.args[0])})"
+
+    def _print_factorial(self, expr) -> str:
+        arg = expr.args[0]
+        arg_str = self.parenthesize(arg, precedence(expr), strict=False)
+        return f"{arg_str}!"
+
+    def _print_Exp1(self, expr) -> str:
+        return "e"
+
     def _print_Infinity(self, expr) -> str:
         return "oo"
 
@@ -182,6 +198,71 @@ class LmatTypstPrinter(StrPrinter):
 
     def _print_BooleanFalse(self, _: BooleanFalse) -> str:
         return "F"
+
+    def _print_Integral(self, expr) -> str:
+        func_str = self._print(expr.function)
+        parts = []
+        for limit in expr.limits:
+            if len(limit) == 1:
+                # Indefinite integral: (x,)
+                var = self._print(limit[0])
+                parts.append(f"integral {func_str} dif {var}")
+            else:
+                # Definite integral: (x, a, b)
+                var, lower, upper = limit
+                parts.append(
+                    f"integral_{self._print(lower)}^{self._print(upper)} {func_str} dif {self._print(var)}"
+                )
+        return " ".join(parts)
+
+    def _print_Sum(self, expr) -> str:
+        func_str = self._print(expr.function)
+        (var, lower, upper) = expr.limits[0]
+        return f"sum_({self._print(var)} = {self._print(lower)})^{self._print(upper)} {func_str}"
+
+    def _print_Product(self, expr) -> str:
+        func_str = self._print(expr.function)
+        (var, lower, upper) = expr.limits[0]
+        return f"product_({self._print(var)} = {self._print(lower)})^{self._print(upper)} {func_str}"
+
+    def _print_Limit(self, expr) -> str:
+        func, var, point, direction = expr.args
+        point_str = self._print(point)
+        # Standard mathematical notation: direction indicator on the limit point.
+        # SymPy '+' is the default (right-hand / bilateral limit) — shown without marker.
+        # SymPy '-' is an explicit left-hand limit — shown as a⁻.
+        if str(direction) == "-":
+            point_str = f"{point_str}^-"
+        return f"lim_({self._print(var)} -> {point_str}) {self._print(func)}"
+
+    def _print_Derivative(self, expr) -> str:
+        func = expr.args[0]
+        # Count order for each variable from the (var, order) pairs in args[1:]
+        var_orders: list[tuple[Any, Any]] = list(expr.args[1:])
+        total_order = sum(int(order) for _, order in var_orders)
+        func_str = self._print(func)
+        # Build denominator: dif x dif y or dif x^2 for repeated vars
+        denom_parts = []
+        for var, order in var_orders:
+            var_str = self._print(var)
+            if int(order) == 1:
+                denom_parts.append(f"dif {var_str}")
+            else:
+                denom_parts.append(f"dif {var_str}^{order}")
+        denom = " ".join(denom_parts)
+        if total_order == 1:
+            return f"(dif {func_str}) / ({denom})"
+        return f"(dif^{total_order} {func_str}) / ({denom})"
+
+    def _print_Piecewise(self, expr) -> str:
+        cases = []
+        for value, cond in expr.args:
+            value_str = self._print(value)
+            if cond is S.true:
+                cases.append(f"{value_str} otherwise")
+            else:
+                cases.append(f"{value_str} if {self._print(cond)}")
+        return "cases(" + ", ".join(cases) + ")"
 
     def _print_Quantity(self, expr: Quantity) -> str:
         # Prefer the unit's abbreviation (e.g. 'km', 'm', 'kg') for display.

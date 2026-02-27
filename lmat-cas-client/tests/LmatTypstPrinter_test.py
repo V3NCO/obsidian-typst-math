@@ -111,5 +111,58 @@ class TestLmatTypstPrinter:
         assert lmat_typst(u.kilogram) == "kg"
         assert lmat_typst(5 * u.km / u.hour) == "5 km/hour"
 
+    def test_abs(self):
+        x = Symbol("x")
+        assert lmat_typst(Abs(x)) == "abs(x)"
+        assert lmat_typst(Abs(x - 1)) == "abs(x - 1)"
+
+    def test_ceiling(self):
+        x = Symbol("x")
+        assert lmat_typst(ceiling(x)) == "ceil(x)"
+
+    def test_factorial(self):
+        n = Symbol("n")
+        assert lmat_typst(factorial(n)) == "n!"
+        assert lmat_typst(factorial(5)) == "120"
+
+    def test_euler_constant(self):
+        # Euler's number must render as lowercase 'e', not uppercase 'E'.
+        assert lmat_typst(E) == "e"
+        x = Symbol("x")
+        assert lmat_typst(exp(x)) == "e^x"
+
+    def test_integral_indefinite(self):
+        x = Symbol("x")
+        assert lmat_typst(Integral(sin(x), x)) == "integral sin(x) dif x"
+
+    def test_integral_definite(self):
+        x = Symbol("x")
+        assert lmat_typst(Integral(x**2, (x, 0, 1))) == "integral_0^1 x^2 dif x"
+
+    def test_sum(self):
+        x, n = symbols("x n")
+        assert lmat_typst(Sum(x**2, (x, 0, n))) == "sum_(x = 0)^n x^2"
+
+    def test_product(self):
+        x, n = symbols("x n")
+        assert lmat_typst(Product(x, (x, 1, n))) == "product_(x = 1)^n x"
+
+    def test_limit(self):
+        x = Symbol("x")
+        # Standard (right-hand / bilateral) limit — no direction marker on point.
+        assert lmat_typst(Limit(sin(x) / x, x, 0)) == "lim_(x -> 0) sin(x)/x"
+        # Explicit left-hand limit — direction marker ⁻ on the limit point.
+        assert lmat_typst(Limit(S.One / x, x, 0, "-")) == "lim_(x -> 0^-) 1/x"
+
+    def test_derivative(self):
+        x = Symbol("x")
+        assert lmat_typst(Derivative(x**2, x)) == "(dif x^2) / (dif x)"
+        assert lmat_typst(Derivative(sin(x), x, 2)) == "(dif^2 sin(x)) / (dif x^2)"
+
+    def test_piecewise(self):
+        x = Symbol("x")
+        result = lmat_typst(Piecewise((x, x > 0), (-x, S.true)))
+        assert result == "cases(x if x > 0, -x otherwise)"
+
     def _assert_str_equal(self, expected, actual):
         assert "".join(expected.split()) == "".join(actual.split())
